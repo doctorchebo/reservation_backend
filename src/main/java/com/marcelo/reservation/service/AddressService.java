@@ -1,7 +1,6 @@
 package com.marcelo.reservation.service;
 
-import com.marcelo.reservation.dto.address.AddressDto;
-import com.marcelo.reservation.dto.address.AddressRequest;
+import com.marcelo.reservation.dto.address.*;
 import com.marcelo.reservation.exception.NotFoundException;
 import com.marcelo.reservation.mapper.AddressMapper;
 import com.marcelo.reservation.model.Address;
@@ -64,5 +63,37 @@ public class AddressService {
                         String.format("Business with id %s not found", addressId)));
         addressRepository.delete(address);
         return addressMapper.mapToDto(address);
+    }
+
+    public List<AddressDto> getAllAddressesByBusinessId(Long businessId) {
+        businessRepository.findById(businessId)
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Business with id %s doesn't exist", businessId)));
+        List<Address> addresses = addressRepository.findAllByBusinessId(businessId);
+        logger.info("{} addresses found for business with id {}", addresses.size(), businessId);
+        return addressMapper.mapToDtoList(addresses);
+    }
+
+    public AddressDto patchAddressName(AddressPatchNameRequest request) {
+        Address address = addressRepository.findById(request.getAddressId())
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Address with id %s not found", request.getAddressId())));
+        address.setName(request.getName());
+        return addressMapper.mapToDto(addressRepository.save(address));
+    }
+
+    public AddressDto patchAddressLatitude(AddressPatchGeolocationLatitudeRequest request) {
+        Address address = addressRepository.findById(request.getAddressId())
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Address with id %s not found", request.getAddressId())));
+        address.getGeolocation().setLatitude(request.getLatitude());
+        return addressMapper.mapToDto(addressRepository.save(address));
+    }
+    public AddressDto patchAddressLongitude(AddressPatchGeolocationLongitudeRequest request) {
+        Address address = addressRepository.findById(request.getAddressId())
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Address with id %s not found", request.getAddressId())));
+        address.getGeolocation().setLongitude(request.getLongitude());
+        return addressMapper.mapToDto(addressRepository.save(address));
     }
 }

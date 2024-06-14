@@ -130,7 +130,8 @@ public class BusinessService {
                         new NotFoundException(String.format("Business with id %s not found", request.getBusinessId())));
 
         List<Category> newCategories = categoryRepository.findAllById(request.getCategoryIds());
-        business.setCategories(newCategories);
+        business.getCategories().clear();
+        business.getCategories().addAll(newCategories);
         Business saveBusiness = businessRepository.save(business);
         return businessMapper.mapToResponse(saveBusiness);
     }
