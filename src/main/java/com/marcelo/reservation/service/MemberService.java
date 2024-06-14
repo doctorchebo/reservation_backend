@@ -1,7 +1,8 @@
 package com.marcelo.reservation.service;
 
 import com.marcelo.reservation.dto.member.MemberDto;
-import com.marcelo.reservation.dto.member.MemberPatchRequest;
+import com.marcelo.reservation.dto.member.PatchMemberFirstNameRequest;
+import com.marcelo.reservation.dto.member.PatchMemberLastNameRequest;
 import com.marcelo.reservation.exception.NotFoundException;
 import com.marcelo.reservation.mapper.MemberMapper;
 import com.marcelo.reservation.model.Business;
@@ -70,5 +71,28 @@ public class MemberService {
                 .orElseThrow(() -> new NotFoundException(
                         String.format("Member with id %s not found", memberId)));
         return memberMapper.mapToDto(member);
+    }
+
+    public MemberDto getMemberByUserId(Long userId) {
+        Member member = memberRepository.findByUserId(userId)
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Member with user id %s not found", userId)));
+        return memberMapper.mapToDto(member);
+    }
+
+    public MemberDto patchMemberFirstName(PatchMemberFirstNameRequest request) {
+        Member member = memberRepository.findById(request.getMemberId())
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Member with id %s not found", request.getMemberId())));
+        member.setFirstName(request.getFirstName());
+        return memberMapper.mapToDto(memberRepository.save(member));
+    }
+
+    public MemberDto patchMemberLastName(PatchMemberLastNameRequest request) {
+        Member member = memberRepository.findById(request.getMemberId())
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Member with id %s not found", request.getMemberId())));
+        member.setLastName(request.getLastName());
+        return memberMapper.mapToDto(memberRepository.save(member));
     }
 }
