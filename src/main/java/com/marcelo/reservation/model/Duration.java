@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
+import java.util.List;
 
 @Entity
 @AllArgsConstructor
@@ -16,11 +17,11 @@ public class Duration {
     private Long id;
 
     private java.time.Duration duration;
-    @ManyToOne()
+    @ManyToOne
     private Business business;
 
-    @ManyToOne()
-    public Service service;
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy="durations")
+    public List<Service> services;
 
     private Instant created;
 

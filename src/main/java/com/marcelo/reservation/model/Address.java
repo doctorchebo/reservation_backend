@@ -30,7 +30,6 @@ public class Address {
     @NotBlank(message = "Address cannot be blank")
     private String name;
 
-    @JsonProperty("isMainAddress")
     private boolean isMainAddress;
 
     private Instant created;

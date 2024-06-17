@@ -22,7 +22,13 @@ public class Service {
 
     @ManyToMany(mappedBy = "services", fetch = FetchType.EAGER)
     public List<Business> businesses;
-    @OneToMany(mappedBy = "service", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "service_duration",
+            joinColumns = @JoinColumn(name = "service_id"),
+            inverseJoinColumns = @JoinColumn(name = "duration_id")
+    )
     public List<Duration> durations;
 
     @OneToMany(mappedBy = "service", fetch = FetchType.EAGER, cascade=CascadeType.ALL, orphanRemoval=true)

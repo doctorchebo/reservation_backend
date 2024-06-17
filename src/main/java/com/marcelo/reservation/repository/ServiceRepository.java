@@ -1,5 +1,7 @@
 package com.marcelo.reservation.repository;
 
+import com.marcelo.reservation.model.Category;
+import com.marcelo.reservation.model.Duration;
 import com.marcelo.reservation.model.Service;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -28,4 +30,8 @@ public interface ServiceRepository extends JpaRepository<Service, UUID> {
     List<Service> findAllByBusinessesId(Long businessId);
 
     Optional<Service> findAllByIdAndBusinessesId(UUID serviceId, Long businessId);
+
+    List<Service> findAllByCategories(List<Category> categories);
+
+    List<Service> findByDurations(List<Duration> durations);
 }

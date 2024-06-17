@@ -47,4 +47,8 @@ public class AddressController {
     public ResponseEntity<AddressDto> patchAddressLongitude(@RequestBody AddressPatchGeolocationLongitudeRequest request){
         return ResponseEntity.ok(addressService.patchAddressLongitude(request));
     }
+    @PatchMapping("patchIsMainAddress")
+    public ResponseEntity<AddressDto> patchAddressIsMainAddress(@RequestBody AddressPatchIsMainAddressRequest request){
+        return ResponseEntity.ok(addressService.patchAddressIsMainAddress(request));
+    }
 }

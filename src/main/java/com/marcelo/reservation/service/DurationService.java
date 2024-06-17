@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,10 +37,15 @@ public class DurationService {
         return durationMapper.mapToDtoList(durationRepository.findAll());
     }
     public DurationDto getAllByServiceIdAndBusinessId(UUID serviceId, Long businessId) {
-        Duration duration = durationRepository.findAllByServiceIdAndBusinessId(serviceId, businessId)
+        Duration duration = durationRepository.findAllByServicesIdAndBusinessId(serviceId, businessId)
                 .orElseThrow(() -> new NotFoundException(
                         String.format("Duration for service with id %s and business id %s not found", serviceId, businessId)));
         return durationMapper.mapToDto(duration);
+    }
+
+    public List<DurationDto> getAllDurationsByBusinessId(Long businessId) {
+        List<Duration> durations = durationRepository.findAllByBusinessId(businessId);
+        return durationMapper.mapToDtoList(durations);
     }
 
     public DurationDto createDuration(DurationRequest durationRequest) {
@@ -54,7 +60,7 @@ public class DurationService {
         Duration duration = Duration.builder()
                 .duration(durationRequest.getDuration())
                 .business(business)
-                .service(service)
+                .services(new ArrayList<com.marcelo.reservation.model.Service>())
                 .created(Instant.now())
                 .build();
 
@@ -70,5 +76,4 @@ public class DurationService {
 
         return durationMapper.mapToDto(duration);
     }
-
 }

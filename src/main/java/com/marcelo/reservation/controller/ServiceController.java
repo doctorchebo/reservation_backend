@@ -1,6 +1,7 @@
 package com.marcelo.reservation.controller;
 
 import com.marcelo.reservation.dto.service.ServiceDto;
+import com.marcelo.reservation.dto.service.ServicePatchDurationsRequest;
 import com.marcelo.reservation.service.ServiceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +41,11 @@ public class ServiceController {
         return ResponseEntity.ok(serviceService.getAllByCategoryId(categoryId));
     }
 
+    @GetMapping("getAllAvailableByBusinessId/{businessId}")
+    public ResponseEntity<List<ServiceDto>> getAllCategoriesAvailableByBusinessId(@PathVariable Long businessId){
+        return ResponseEntity.ok(serviceService.getAllCategoriesAvailableByBusinessId(businessId));
+    }
+
     @GetMapping("getAvailableServices/{serviceId}/{startDate}")
     public ResponseEntity<List<ServiceDto>> getAvailableServicesByIdAndStartDate(
             @PathVariable("serviceId") UUID serviceId, @PathVariable("startDate") Instant startDate){
@@ -62,8 +68,8 @@ public class ServiceController {
     }
 
     @PatchMapping("patchDurations")
-    public ResponseEntity<ServiceDto> patchDurations(@Valid @RequestBody ServiceDto serviceDto){
-        return ResponseEntity.ok(serviceService.patchDuration(serviceDto));
+    public ResponseEntity<ServiceDto> patchServiceDurations(@Valid @RequestBody ServicePatchDurationsRequest request){
+        return ResponseEntity.ok(serviceService.patchDurations(request));
     }
 
     @PatchMapping("patchCategories")

@@ -212,19 +212,15 @@ public class BusinessService {
     }
 
     @Transactional
-    public BusinessResponse updateServices(BusinessPatchRequest businessPatchRequest) {
-        Business business = businessRepository.findById(businessPatchRequest.getBusinessId())
+    public BusinessResponse patchBusinessServices(BusinessPatchServicesRequest request) {
+        Business business = businessRepository.findById(request.getBusinessId())
                 .orElseThrow(() -> new NotFoundException(
-                        String.format("Business with id %s not found", businessPatchRequest.getBusinessId())));
+                        String.format("Business with id %s not found", request.getBusinessId())));
 
-        List<com.marcelo.reservation.model.Service> existingServices = business.getServices();
+        List<com.marcelo.reservation.model.Service> services = serviceRepository.findAllById(request.getServiceIds());
 
-        List<com.marcelo.reservation.model.Service> services = serviceRepository.findAllById(businessPatchRequest.getServiceIds());
-        for(com.marcelo.reservation.model.Service service : services){
-            if(!existingServices.contains(service)){
-                existingServices.add(service);
-            }
-        }
+        business.getServices().clear();
+        business.setServices(services);
         Business savedBusiness = businessRepository.save(business);
         return businessMapper.mapToResponse(savedBusiness);
     }

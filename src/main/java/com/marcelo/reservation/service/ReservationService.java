@@ -80,7 +80,7 @@ public class ReservationService {
                 .orElseThrow(() -> new NotFoundException(
                         String.format("Service with id %s not found", reservationRequest.getMemberId())));
 
-        Duration duration = durationRepository.findAllByServiceIdAndBusinessId(reservationRequest.getServiceId(), reservationRequest.getBusinessId())
+        Duration duration = durationRepository.findAllByServicesIdAndBusinessId(reservationRequest.getServiceId(), reservationRequest.getBusinessId())
                 .orElseThrow(() -> new NotFoundException(
                         String.format("Duration with service id %s and business id %s not found",
                                 reservationRequest.getServiceId(),

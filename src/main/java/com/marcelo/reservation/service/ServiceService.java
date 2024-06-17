@@ -1,6 +1,7 @@
 package com.marcelo.reservation.service;
 
 import com.marcelo.reservation.dto.service.ServiceDto;
+import com.marcelo.reservation.dto.service.ServicePatchDurationsRequest;
 import com.marcelo.reservation.exception.NotFoundException;
 import com.marcelo.reservation.mapper.ServiceMapper;
 import com.marcelo.reservation.model.Business;
@@ -17,10 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -104,24 +102,28 @@ public class ServiceService {
         return serviceMapper.mapToDtoList(services);
     }
 
-    public ServiceDto patchDuration(ServiceDto serviceDto) {
-        com.marcelo.reservation.model.Service service = serviceRepository.findById(serviceDto.getId())
-                .orElseThrow(() -> new NotFoundException(
-                        String.format("Service with id %s not found", serviceDto.getId())));
+    public List<ServiceDto> getAllCategoriesAvailableByBusinessId(Long businessId) {
+        List<Category> categories = categoryRepository.findAllByBusinessesId(businessId);
+        List<com.marcelo.reservation.model.Service> services = serviceRepository.findAllByCategories(categories);
+        return serviceMapper.mapToDtoList(services);
+    }
 
-        List<Duration> durations = durationRepository.findAllById(serviceDto.getDurationIds());
-        List<Duration> existingDurations = service.getDurations();
-        for(Duration duration : durations){
-            if(!existingDurations.contains(duration)){
-                existingDurations.add(duration);
-            }
-        }
+    public ServiceDto patchDurations(ServicePatchDurationsRequest request) {
+        logger.info("Patching service durations");
+        com.marcelo.reservation.model.Service service = serviceRepository.findById(request.getServiceId())
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Service with id %s not found", request.getServiceId())));
+
+        List<Duration> durations = durationRepository.findAllById(request.getDurationIds());
+        service.getDurations().clear();
+        service.setDurations(durations);
         com.marcelo.reservation.model.Service savedService = serviceRepository.save(service);
 
         return serviceMapper.mapToDto(savedService);
     }
 
     public ServiceDto patchCategories(ServiceDto serviceDto) {
+        logger.info("Patching categories");
         com.marcelo.reservation.model.Service service = serviceRepository.findById(serviceDto.getId())
                 .orElseThrow(() -> new NotFoundException(
                         String.format("Service with id %s not found", serviceDto.getId())));

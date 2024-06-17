@@ -84,9 +84,9 @@ public class BusinessController {
         return ResponseEntity.ok(businessService.updateBusinessImages(businessId, images));
     }
 
-    @PatchMapping(value = "updateServices")
-    public ResponseEntity<BusinessResponse> updateServices(@Valid @RequestBody BusinessPatchRequest businessPatchRequest){
-        return ResponseEntity.ok(businessService.updateServices(businessPatchRequest));
+    @PatchMapping(value = "patchServices")
+    public ResponseEntity<BusinessResponse> patchBusinessServices(@Valid @RequestBody BusinessPatchServicesRequest businessPatchServicesRequest){
+        return ResponseEntity.ok(businessService.patchBusinessServices(businessPatchServicesRequest));
     }
 
     @GetMapping("getAvailableByServiceId/{serviceId}/{startDate}")

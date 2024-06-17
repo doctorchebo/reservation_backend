@@ -28,6 +28,10 @@ public class DurationController {
             @PathVariable("serviceId") UUID serviceId, @PathVariable("businessId") Long businessId){
         return ResponseEntity.ok(durationService.getAllByServiceIdAndBusinessId(serviceId, businessId));
     }
+    @GetMapping("getAllByBusinessId/{businessId}")
+    public ResponseEntity<List<DurationDto>> getAllDurationsByBusinessId(@PathVariable Long businessId){
+        return ResponseEntity.ok(durationService.getAllDurationsByBusinessId(businessId));
+    }
 
     @PostMapping("create")
     public ResponseEntity<DurationDto> createDuration(@RequestBody DurationRequest durationRequest){

@@ -50,6 +50,17 @@ public class AddressService {
         savedAddress.setGeolocation(geolocation);
 
         Address savedAddressWithGeolocation = addressRepository.save(savedAddress);
+        // if new address is the main one, make other addresses secondary
+        if(addressRequest.isMainAddress()){
+            List<Address> addresses = addressRepository.findAllByBusinessId(addressRequest.getBusinessId());
+            for(Address existingAddress : addresses){
+                if(!addresses.contains(address)) {
+                    existingAddress.setMainAddress(false);
+                }
+            }
+            addressRepository.saveAll(addresses);
+        }
+
         return addressMapper.mapToDto(savedAddressWithGeolocation);
     }
 
@@ -95,5 +106,23 @@ public class AddressService {
                         String.format("Address with id %s not found", request.getAddressId())));
         address.getGeolocation().setLongitude(request.getLongitude());
         return addressMapper.mapToDto(addressRepository.save(address));
+    }
+
+    public AddressDto patchAddressIsMainAddress(AddressPatchIsMainAddressRequest request) {
+        Address targetAddress = addressRepository.findById(request.getAddressId())
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Address with id %s not found", request.getAddressId())));
+        targetAddress.setMainAddress(true);
+        Address savedAddress = addressRepository.save(targetAddress);
+        // make rest of addresses not main
+        List<Address> addresses = addressRepository.findAllByBusinessId(request.getBusinessId());
+        for(Address address : addresses){
+            if(!addresses.contains(targetAddress)){
+                address.setMainAddress(false);
+            }
+        }
+        addressRepository.saveAll(addresses);
+
+        return addressMapper.mapToDto(addressRepository.save(savedAddress));
     }
 }

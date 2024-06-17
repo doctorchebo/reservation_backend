@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Data
-public class BusinessPatchRequest {
+public class BusinessPatchServicesRequest {
     private Long businessId;
     private List<UUID> serviceIds;
 }
