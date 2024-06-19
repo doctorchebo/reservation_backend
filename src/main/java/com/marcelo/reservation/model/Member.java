@@ -41,6 +41,8 @@ public class Member {
     private String phoneNumber;
 
     private boolean isActive;
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Address address;
 
     private Instant created;
 

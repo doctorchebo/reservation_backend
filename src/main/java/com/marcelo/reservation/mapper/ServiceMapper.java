@@ -1,10 +1,7 @@
 package com.marcelo.reservation.mapper;
 
 import com.marcelo.reservation.dto.service.ServiceDto;
-import com.marcelo.reservation.model.Business;
-import com.marcelo.reservation.model.Category;
-import com.marcelo.reservation.model.Duration;
-import com.marcelo.reservation.model.Service;
+import com.marcelo.reservation.model.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -12,11 +9,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {AddressMapper.class})
 public interface ServiceMapper {
     @Mapping(target="durationIds", expression="java(getDurationsIds(service.durations))")
     @Mapping(target="categoryIds", expression="java(getCategoriesIds(service.categories))")
     @Mapping(target="businessIds", expression="java(getBusinessIds(service.businesses))")
+    @Mapping(target="addressIds", expression="java(getAddressIds(service.addresses))")
     ServiceDto mapToDto(Service service);
 
     List<ServiceDto> mapToDtoList(List<Service> services);
@@ -51,6 +49,14 @@ public interface ServiceMapper {
         }
         return businesses.stream()
                 .map(business -> business.getId())
+                .collect(Collectors.toList());
+    }
+    default List<Long> getAddressIds(List<Address> addresses){
+        if(addresses == null){
+            return Collections.emptyList();
+        }
+        return addresses.stream()
+                .map(address -> address.getId())
                 .collect(Collectors.toList());
     }
 }

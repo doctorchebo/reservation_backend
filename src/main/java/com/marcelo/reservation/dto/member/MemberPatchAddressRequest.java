@@ -3,7 +3,7 @@ package com.marcelo.reservation.dto.member;
 import lombok.Data;
 
 @Data
-public class PatchMemberFirstNameRequest {
+public class MemberPatchAddressRequest {
     private Long memberId;
-    private String firstName;
+    private Long addressId;
 }

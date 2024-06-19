@@ -27,6 +27,7 @@ public class MemberDto {
     private String phoneNumber;
     @JsonProperty("isActive")
     private boolean isActive;
+    private Long addressId;
     private Instant created;
     private Instant modified;
 }

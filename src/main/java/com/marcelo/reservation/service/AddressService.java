@@ -6,6 +6,7 @@ import com.marcelo.reservation.mapper.AddressMapper;
 import com.marcelo.reservation.model.Address;
 import com.marcelo.reservation.model.Business;
 import com.marcelo.reservation.model.Geolocation;
+import com.marcelo.reservation.model.Member;
 import com.marcelo.reservation.repository.AddressRepository;
 import com.marcelo.reservation.repository.BusinessRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -37,6 +39,8 @@ public class AddressService {
                 .business(business)
                 .geolocation(null)
                 .isMainAddress(addressRequest.isMainAddress())
+                .members(new ArrayList<Member>())
+                .services(new ArrayList<com.marcelo.reservation.model.Service>())
                 .created(Instant.now())
                 .build();
         Address savedAddress = addressRepository.save(address);

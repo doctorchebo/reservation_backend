@@ -11,6 +11,7 @@ import java.util.List;
 public interface MemberMapper {
     @Mapping(target="businessId", source="business.id")
     @Mapping(target="userId", source="user.id")
+    @Mapping(target="addressId", source="address.id")
     MemberDto mapToDto(Member member);
 
     Member map(MemberDto memberDto);

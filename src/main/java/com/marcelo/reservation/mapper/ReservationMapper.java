@@ -16,7 +16,6 @@ public interface ReservationMapper {
     @Mapping(target="serviceId", source="service.id")
     @Mapping(target="memberId", source="member.id")
     ReservationDto mapToDto(Reservation reservation);
-
     ReservationDetailedDto mapToDetailedDto(Reservation reservation);
     Reservation map(ReservationDto reservationDto);
     List<ReservationDto> mapToDtoList(List<Reservation> reservations);

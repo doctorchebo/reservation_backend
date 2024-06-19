@@ -1,13 +1,13 @@
 package com.marcelo.reservation.service;
 
-import com.marcelo.reservation.dto.member.MemberDto;
-import com.marcelo.reservation.dto.member.PatchMemberFirstNameRequest;
-import com.marcelo.reservation.dto.member.PatchMemberLastNameRequest;
+import com.marcelo.reservation.dto.member.*;
 import com.marcelo.reservation.exception.NotFoundException;
 import com.marcelo.reservation.mapper.MemberMapper;
+import com.marcelo.reservation.model.Address;
 import com.marcelo.reservation.model.Business;
 import com.marcelo.reservation.model.Member;
 import com.marcelo.reservation.model.User;
+import com.marcelo.reservation.repository.AddressRepository;
 import com.marcelo.reservation.repository.BusinessRepository;
 import com.marcelo.reservation.repository.MemberRepository;
 import com.marcelo.reservation.repository.UserRepository;
@@ -24,6 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class MemberService {
+    private final AddressRepository addressRepository;
     private final UserRepository userRepository;
 
     private static Logger logger = LoggerFactory.getLogger(MemberService.class);
@@ -52,6 +53,10 @@ public class MemberService {
                 .orElseThrow(() -> new NotFoundException(
                         String.format("Business with id %s not found", memberDto.getBusinessId())));
 
+        Address address = addressRepository.findById(memberDto.getAddressId())
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Address with id %s not found", memberDto.getAddressId())));
+
         Member member = Member.builder()
                 .title(memberDto.getTitle())
                 .firstName(memberDto.getFirstName())
@@ -60,6 +65,7 @@ public class MemberService {
                 .isActive(memberDto.isActive())
                 .user(user)
                 .business(business)
+                .address(address)
                 .created(Instant.now())
                 .build();
 
@@ -80,7 +86,7 @@ public class MemberService {
         return memberMapper.mapToDto(member);
     }
 
-    public MemberDto patchMemberFirstName(PatchMemberFirstNameRequest request) {
+    public MemberDto patchMemberFirstName(MemberPatchFirstNameRequest request) {
         Member member = memberRepository.findById(request.getMemberId())
                 .orElseThrow(() -> new NotFoundException(
                         String.format("Member with id %s not found", request.getMemberId())));
@@ -88,11 +94,38 @@ public class MemberService {
         return memberMapper.mapToDto(memberRepository.save(member));
     }
 
-    public MemberDto patchMemberLastName(PatchMemberLastNameRequest request) {
+    public MemberDto patchMemberLastName(MemberPatchLastNameRequest request) {
         Member member = memberRepository.findById(request.getMemberId())
                 .orElseThrow(() -> new NotFoundException(
                         String.format("Member with id %s not found", request.getMemberId())));
         member.setLastName(request.getLastName());
+        return memberMapper.mapToDto(memberRepository.save(member));
+    }
+
+    public MemberDto patchMemberPhoneNumber(MemberPatchPhoneNumberRequest request) {
+        Member member = memberRepository.findById(request.getMemberId())
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Member with id %s not found", request.getMemberId())));
+        member.setPhoneNumber(request.getPhoneNumber());
+        return memberMapper.mapToDto(memberRepository.save(member));
+    }
+
+    public MemberDto patchMemberTitle(MemberPatchTitleRequest request) {
+        Member member = memberRepository.findById(request.getMemberId())
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Member with id %s not found", request.getMemberId())));
+        member.setTitle(request.getTitle());
+        return memberMapper.mapToDto(memberRepository.save(member));
+    }
+
+    public MemberDto patchMemberAddress(MemberPatchAddressRequest request) {
+        Member member = memberRepository.findById(request.getMemberId())
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Member with id %s not found", request.getMemberId())));
+        Address address = addressRepository.findById(request.getAddressId())
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Address with id %s not found", request.getAddressId())));
+        member.setAddress(address);
         return memberMapper.mapToDto(memberRepository.save(member));
     }
 }

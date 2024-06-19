@@ -1,16 +1,10 @@
 package com.marcelo.reservation.service;
 
-import com.marcelo.reservation.dto.service.ServiceDto;
-import com.marcelo.reservation.dto.service.ServicePatchDurationsRequest;
+import com.marcelo.reservation.dto.service.*;
 import com.marcelo.reservation.exception.NotFoundException;
 import com.marcelo.reservation.mapper.ServiceMapper;
-import com.marcelo.reservation.model.Business;
-import com.marcelo.reservation.model.Category;
-import com.marcelo.reservation.model.Duration;
-import com.marcelo.reservation.repository.BusinessRepository;
-import com.marcelo.reservation.repository.CategoryRepository;
-import com.marcelo.reservation.repository.DurationRepository;
-import com.marcelo.reservation.repository.ServiceRepository;
+import com.marcelo.reservation.model.*;
+import com.marcelo.reservation.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -25,6 +19,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class ServiceService {
+    private final AddressRepository addressRepository;
     private static Logger logger = LoggerFactory.getLogger(ServiceService.class);
 
     private final ServiceRepository serviceRepository;
@@ -66,6 +61,7 @@ public class ServiceService {
                 .name(serviceDto.getName())
                 .businesses(businesses)
                 .durations(new ArrayList<Duration>())
+                .addresses(new ArrayList<Address>())
                 .created(Instant.now())
                 .build();
 
@@ -102,10 +98,16 @@ public class ServiceService {
         return serviceMapper.mapToDtoList(services);
     }
 
-    public List<ServiceDto> getAllCategoriesAvailableByBusinessId(Long businessId) {
-        List<Category> categories = categoryRepository.findAllByBusinessesId(businessId);
-        List<com.marcelo.reservation.model.Service> services = serviceRepository.findAllByCategories(categories);
-        return serviceMapper.mapToDtoList(services);
+    public List<ServiceDto> getAllServicesAvailableByBusinessId(Long businessId) {
+        return serviceMapper.mapToDtoList(serviceRepository.findAllByBusinessesId(businessId));
+    }
+
+    public ServiceDto patchServiceName(ServicePatchNameRequest request) {
+        com.marcelo.reservation.model.Service service = serviceRepository.findById(request.getServiceId())
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Service with id %s not found", request.getServiceId())));
+        service.setName(request.getName());
+        return serviceMapper.mapToDto(serviceRepository.save(service));
     }
 
     public ServiceDto patchDurations(ServicePatchDurationsRequest request) {
@@ -117,6 +119,19 @@ public class ServiceService {
         List<Duration> durations = durationRepository.findAllById(request.getDurationIds());
         service.getDurations().clear();
         service.setDurations(durations);
+        com.marcelo.reservation.model.Service savedService = serviceRepository.save(service);
+
+        return serviceMapper.mapToDto(savedService);
+    }
+
+    public ServiceDto patchServiceAddresses(ServicePatchAddressesRequest request) {
+        com.marcelo.reservation.model.Service service = serviceRepository.findById(request.getServiceId())
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Service with id %s not found", request.getServiceId())));
+
+        List<Address> addresses = addressRepository.findAllById(request.getAddressIds());
+        service.getAddresses().clear();
+        service.setAddresses(addresses);
         com.marcelo.reservation.model.Service savedService = serviceRepository.save(service);
 
         return serviceMapper.mapToDto(savedService);
@@ -138,5 +153,18 @@ public class ServiceService {
         com.marcelo.reservation.model.Service savedService = serviceRepository.save(service);
 
         return serviceMapper.mapToDto(savedService);
+    }
+
+
+    public ServiceDto patchServicePrice(ServicePatchPriceRequest request) {
+        com.marcelo.reservation.model.Service service = serviceRepository.findById(request.getServiceId())
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Service with id %s not found", request.getServiceId())));
+        for(Price price : service.getPrices()){
+            if(price.getBusiness().getId().equals(request.getBusinessId())){
+                price.setPrice(request.getPrice());
+            }
+        }
+        return serviceMapper.mapToDto(serviceRepository.save(service));
     }
 }

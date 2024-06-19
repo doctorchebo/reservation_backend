@@ -13,6 +13,8 @@ public class ServiceDto {
     private List<Long> categoryIds;
     private List<Long> durationIds;
     private List<Long> businessIds;
+    private List<Long> addressIds;
+    private List<Long> priceIds;
     private Instant created;
     private Instant modified;
 }

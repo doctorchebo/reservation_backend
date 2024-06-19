@@ -1,7 +1,6 @@
 package com.marcelo.reservation.controller;
 
-import com.marcelo.reservation.dto.service.ServiceDto;
-import com.marcelo.reservation.dto.service.ServicePatchDurationsRequest;
+import com.marcelo.reservation.dto.service.*;
 import com.marcelo.reservation.service.ServiceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -42,8 +41,8 @@ public class ServiceController {
     }
 
     @GetMapping("getAllAvailableByBusinessId/{businessId}")
-    public ResponseEntity<List<ServiceDto>> getAllCategoriesAvailableByBusinessId(@PathVariable Long businessId){
-        return ResponseEntity.ok(serviceService.getAllCategoriesAvailableByBusinessId(businessId));
+    public ResponseEntity<List<ServiceDto>> getAllServicesAvailableByBusinessId(@PathVariable Long businessId){
+        return ResponseEntity.ok(serviceService.getAllServicesAvailableByBusinessId(businessId));
     }
 
     @GetMapping("getAvailableServices/{serviceId}/{startDate}")
@@ -67,13 +66,26 @@ public class ServiceController {
         return ResponseEntity.ok(serviceService.updateService(serviceDto));
     }
 
+    @PatchMapping("patchName")
+    public ResponseEntity<ServiceDto> patchServiceName(@Valid @RequestBody ServicePatchNameRequest request){
+        return ResponseEntity.ok(serviceService.patchServiceName(request));
+    }
+
     @PatchMapping("patchDurations")
     public ResponseEntity<ServiceDto> patchServiceDurations(@Valid @RequestBody ServicePatchDurationsRequest request){
         return ResponseEntity.ok(serviceService.patchDurations(request));
+    }
+    @PatchMapping("patchAddresses")
+    public ResponseEntity<ServiceDto> patchServiceAddresses(@Valid @RequestBody ServicePatchAddressesRequest request){
+        return ResponseEntity.ok(serviceService.patchServiceAddresses(request));
     }
 
     @PatchMapping("patchCategories")
     public ResponseEntity<ServiceDto> patchCategories(@Valid @RequestBody ServiceDto serviceDto){
         return ResponseEntity.ok(serviceService.patchCategories(serviceDto));
+    }
+    @PatchMapping("patchPrice")
+    public ResponseEntity<ServiceDto> patchServicePrice(@Valid @RequestBody ServicePatchPriceRequest request){
+        return ResponseEntity.ok(serviceService.patchServicePrice(request));
     }
 }

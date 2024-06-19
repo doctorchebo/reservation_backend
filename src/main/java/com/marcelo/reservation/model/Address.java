@@ -1,6 +1,5 @@
 package com.marcelo.reservation.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -10,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.util.List;
 
 @Entity
 @AllArgsConstructor
@@ -31,6 +31,12 @@ public class Address {
     private String name;
 
     private boolean isMainAddress;
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, mappedBy = "address")
+    private List<Member> members;
+
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "addresses")
+    private List<Service> services;
 
     private Instant created;
 

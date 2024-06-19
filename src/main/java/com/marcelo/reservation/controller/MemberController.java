@@ -1,8 +1,6 @@
 package com.marcelo.reservation.controller;
 
-import com.marcelo.reservation.dto.member.MemberDto;
-import com.marcelo.reservation.dto.member.PatchMemberFirstNameRequest;
-import com.marcelo.reservation.dto.member.PatchMemberLastNameRequest;
+import com.marcelo.reservation.dto.member.*;
 import com.marcelo.reservation.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -42,11 +40,26 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.CREATED).body(memberService.createMember(memberDto));
     }
     @PatchMapping("patchFirstName")
-    public ResponseEntity<MemberDto> patchMemberFirstName(@RequestBody PatchMemberFirstNameRequest patchMemberFirstNameRequest){
-        return ResponseEntity.ok(memberService.patchMemberFirstName(patchMemberFirstNameRequest));
+    public ResponseEntity<MemberDto> patchMemberFirstName(@RequestBody MemberPatchFirstNameRequest memberPatchFirstNameRequest){
+        return ResponseEntity.ok(memberService.patchMemberFirstName(memberPatchFirstNameRequest));
     }
     @PatchMapping("patchLastName")
-    public ResponseEntity<MemberDto> patchMemberLastName(@RequestBody PatchMemberLastNameRequest patchMemberLastNameRequest){
-        return ResponseEntity.ok(memberService.patchMemberLastName(patchMemberLastNameRequest));
+    public ResponseEntity<MemberDto> patchMemberLastName(@RequestBody MemberPatchLastNameRequest memberPatchLastNameRequest){
+        return ResponseEntity.ok(memberService.patchMemberLastName(memberPatchLastNameRequest));
+    }
+
+    @PatchMapping("patchPhoneNumber")
+    public ResponseEntity<MemberDto> patchMemberPhoneNumber(@RequestBody MemberPatchPhoneNumberRequest request){
+        return ResponseEntity.ok(memberService.patchMemberPhoneNumber(request));
+    }
+
+    @PatchMapping("patchTitle")
+    public ResponseEntity<MemberDto> patchMemberTitle(@RequestBody MemberPatchTitleRequest request){
+        return ResponseEntity.ok(memberService.patchMemberTitle(request));
+    }
+
+    @PatchMapping("patchAddress")
+    public ResponseEntity<MemberDto> patchMemberAddress(@RequestBody MemberPatchAddressRequest request){
+        return ResponseEntity.ok(memberService.patchMemberAddress(request));
     }
 }
