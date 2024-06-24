@@ -27,9 +27,9 @@ public interface ServiceRepository extends JpaRepository<Service, UUID> {
             "AND s.id = :serviceId")
     List<Service> findAvailableServices(UUID serviceId, Instant endDate, Instant startDate);
 
-    List<Service> findAllByBusinessesId(Long businessId);
+    List<Service> findAllByBusinessId(Long businessId);
 
-    Optional<Service> findAllByIdAndBusinessesId(UUID serviceId, Long businessId);
+    Optional<Service> findAllByIdAndBusinessId(UUID serviceId, Long businessId);
 
     List<Service> findAllByCategories(List<Category> categories);
 

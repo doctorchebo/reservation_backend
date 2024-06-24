@@ -47,7 +47,7 @@ public class BusinessController {
     }
 
     @PostMapping("create")
-    public ResponseEntity<BusinessResponse> createBusiness(@Valid @RequestBody BusinessRequest businessRequest){
+    public ResponseEntity<BusinessResponse> createBusiness(@RequestBody BusinessRequest businessRequest){
         return ResponseEntity.ok(businessService.createBusiness(businessRequest));
     }
 
@@ -87,6 +87,11 @@ public class BusinessController {
     @PatchMapping(value = "patchServices")
     public ResponseEntity<BusinessResponse> patchBusinessServices(@Valid @RequestBody BusinessPatchServicesRequest businessPatchServicesRequest){
         return ResponseEntity.ok(businessService.patchBusinessServices(businessPatchServicesRequest));
+    }
+
+    @PatchMapping(value = "patchImages")
+    public ResponseEntity<BusinessResponse> patchBusinessImages(@Valid @ModelAttribute BusinessPatchImagesRequest request){
+        return ResponseEntity.ok(businessService.patchBusinessImages(request));
     }
 
     @GetMapping("getAvailableByServiceId/{serviceId}/{startDate}")

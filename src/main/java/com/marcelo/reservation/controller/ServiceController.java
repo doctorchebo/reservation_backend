@@ -52,8 +52,8 @@ public class ServiceController {
     }
 
     @PostMapping("create")
-    public ResponseEntity<ServiceDto> createService(@Valid @RequestBody ServiceDto serviceDto){
-        return ResponseEntity.status(HttpStatus.CREATED).body(serviceService.createService(serviceDto));
+    public ResponseEntity<ServiceDto> createService(@Valid @RequestBody ServiceCreateRequest request){
+        return ResponseEntity.status(HttpStatus.CREATED).body(serviceService.createService(request));
     }
 
     @DeleteMapping("deleteById/{serviceId}")

@@ -1,6 +1,7 @@
 package com.marcelo.reservation.service;
 
 import com.marcelo.reservation.dto.business.*;
+import com.marcelo.reservation.dto.image.FileRequest;
 import com.marcelo.reservation.exception.NotFoundException;
 import com.marcelo.reservation.mapper.BusinessMapper;
 import com.marcelo.reservation.model.*;
@@ -37,6 +38,10 @@ public class BusinessService {
     private final ImageUploadService imageUploadService;
 
     private final ServiceRepository serviceRepository;
+
+    private final ImageRepository imageRepository;
+
+    private final UserService userService;
     public List<BusinessResponse> getAllBusinesses(){
         logger.info("Getting all businesses");
         List<Business> businesses = businessRepository.findAll();
@@ -51,9 +56,14 @@ public class BusinessService {
     }
     @Transactional
     public BusinessResponse createBusiness(BusinessRequest businessRequest) {
-        User user = userRepository.findById(businessRequest.getOwnerId())
-                .orElseThrow(() ->
-                        new NotFoundException(String.format("User with id %s not found", businessRequest.getOwnerId())));
+        User user;
+        if(businessRequest.getOwnerId() != null){
+            user = userRepository.findById(businessRequest.getOwnerId())
+                    .orElseThrow(() ->
+                            new NotFoundException(String.format("User with id %s not found", businessRequest.getOwnerId())));
+        } else {
+            user = userService.getCurrentUser();
+        }
 
         List<Category> categories = categoryRepository.findAllById(businessRequest.getCategoryIds());
 
@@ -233,5 +243,27 @@ public class BusinessService {
         businessRepository.delete(business);
 
         return businessMapper.mapToResponse(business);
+    }
+
+    public BusinessResponse patchBusinessImages(BusinessPatchImagesRequest request) {
+        Business business = businessRepository.findById(request.getBusinessId())
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Business with id %s not found", request.getBusinessId())));
+
+        List<Image> existingImages = business.getImages();
+        List<Long> existingImageIds = existingImages.stream().map(image -> image.getId()).collect(Collectors.toList());
+
+        for(FileRequest fileRequest : request.getFiles()){
+            //find old image to replace with the new one
+            Image oldImage = existingImages.stream().filter(image -> image.getId().equals(fileRequest.getId())).findAny().orElse(null);
+            if(!oldImage.getUrl().equals(fileRequest.getFile().getName())){
+                //delete image if it's (url) is different from the existing image's url
+                imageUploadService.deleteFileFromS3Bucket(oldImage.getUrl());
+                // upload new image
+                String url = imageUploadService.uploadFile(String.format("media/images/business/%s/", request.getBusinessId()), fileRequest.getFile());
+                oldImage.setUrl(url);
+            }
+        }
+        return businessMapper.mapToResponse(businessRepository.save(business));
     }
 }

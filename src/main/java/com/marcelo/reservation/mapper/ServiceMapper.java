@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public interface ServiceMapper {
     @Mapping(target="durationIds", expression="java(getDurationsIds(service.durations))")
     @Mapping(target="categoryIds", expression="java(getCategoriesIds(service.categories))")
-    @Mapping(target="businessIds", expression="java(getBusinessIds(service.businesses))")
+    @Mapping(target="businessId", source="business.id")
     @Mapping(target="addressIds", expression="java(getAddressIds(service.addresses))")
     ServiceDto mapToDto(Service service);
 
@@ -23,8 +23,8 @@ public interface ServiceMapper {
     @Mapping(target="created", source="serviceDto.created")
     @Mapping(target="modified", expression="java(java.time.Instant.now())")
     @Mapping(target="name", source="serviceDto.name")
-    @Mapping(target="businesses", source="businesses")
-    Service map(ServiceDto serviceDto, List<Business> businesses);
+    @Mapping(target="business", source="business")
+    Service map(ServiceDto serviceDto, Business business);
 
     default List<Long> getDurationsIds(List<Duration> durations){
         if(durations == null){

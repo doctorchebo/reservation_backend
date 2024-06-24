@@ -63,10 +63,18 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserDto getCurrentUser(){
+    public UserDto getCurrentUserDto(){
         Jwt principal = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = userRepository.findByEmail(principal.getSubject())
                 .orElseThrow(() -> new NotFoundException(String.format("User with email %s not found", principal.getClaim("username"))));
         return userMapper.mapToDto(user);
+    }
+
+    @Transactional(readOnly = true)
+    public User getCurrentUser(){
+        Jwt principal = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userRepository.findByEmail(principal.getSubject())
+                .orElseThrow(() -> new NotFoundException(String.format("User with email %s not found", principal.getClaim("username"))));
+        return user;
     }
 }

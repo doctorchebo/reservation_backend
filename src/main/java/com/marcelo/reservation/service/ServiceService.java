@@ -5,6 +5,7 @@ import com.marcelo.reservation.exception.NotFoundException;
 import com.marcelo.reservation.mapper.ServiceMapper;
 import com.marcelo.reservation.model.*;
 import com.marcelo.reservation.repository.*;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class ServiceService {
+    private final PriceRepository priceRepository;
     private final AddressRepository addressRepository;
     private static Logger logger = LoggerFactory.getLogger(ServiceService.class);
 
@@ -32,6 +34,8 @@ public class ServiceService {
 
     private final CategoryRepository categoryRepository;
 
+    private final PriceService priceService;
+
     public List<ServiceDto> getAllServices() {
         return serviceMapper.mapToDtoList(serviceRepository.findAll());
     }
@@ -43,7 +47,7 @@ public class ServiceService {
         return serviceMapper.mapToDto(service);
     }
     public List<ServiceDto> getAllByBusinessId(Long businessId) {
-        List<com.marcelo.reservation.model.Service> services = serviceRepository.findAllByBusinessesId(businessId);
+        List<com.marcelo.reservation.model.Service> services = serviceRepository.findAllByBusinessId(businessId);
         return serviceMapper.mapToDtoList(services);
     }
 
@@ -52,18 +56,32 @@ public class ServiceService {
         return serviceMapper.mapToDtoList(services);
     }
 
-    public ServiceDto createService(ServiceDto serviceDto) {
-        List<Business> businesses = businessRepository.findAllById(serviceDto.getBusinessIds());
+    @Transactional
+    public ServiceDto createService(ServiceCreateRequest request) {
+        Business business = businessRepository.findById(request.getBusinessId())
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Business with id %s not found", request.getBusinessId())));
 
-        //List<Category> categories = categoryRepository.findAllById(serviceDto.getCategoryIds());
+        List<Address> addresses = addressRepository.findAllById(request.getAddressIds());
+        List<Duration> durations = durationRepository.findAllById(request.getDurationIds());
 
         com.marcelo.reservation.model.Service service = com.marcelo.reservation.model.Service.builder()
-                .name(serviceDto.getName())
-                .businesses(businesses)
-                .durations(new ArrayList<Duration>())
-                .addresses(new ArrayList<Address>())
+                .name(request.getName())
+                .business(business)
+                .durations(durations)
+                .addresses(addresses)
                 .created(Instant.now())
                 .build();
+
+        // create and assign price for new service
+        Price price = Price.builder()
+                .price(request.getPrice())
+                .service(service)
+                .business(business)
+                .created(Instant.now())
+                .build();
+
+        service.setPrices(Arrays.asList(price));
 
         return serviceMapper.mapToDto(serviceRepository.save(service));
     }
@@ -77,9 +95,11 @@ public class ServiceService {
     }
 
     public ServiceDto updateService(ServiceDto serviceDto) {
-        List<Business> businesses = businessRepository.findAllById(serviceDto.getBusinessIds());
+        Business business = businessRepository.findById(serviceDto.getBusinessId())
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Business with id %s not found", serviceDto.getBusinessId())));
 
-        com.marcelo.reservation.model.Service service = serviceMapper.map(serviceDto, businesses);
+        com.marcelo.reservation.model.Service service = serviceMapper.map(serviceDto, business);
 
         serviceRepository.deleteById(serviceDto.getId());
 
@@ -99,7 +119,7 @@ public class ServiceService {
     }
 
     public List<ServiceDto> getAllServicesAvailableByBusinessId(Long businessId) {
-        return serviceMapper.mapToDtoList(serviceRepository.findAllByBusinessesId(businessId));
+        return serviceMapper.mapToDtoList(serviceRepository.findAllByBusinessId(businessId));
     }
 
     public ServiceDto patchServiceName(ServicePatchNameRequest request) {

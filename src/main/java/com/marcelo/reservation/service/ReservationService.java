@@ -57,7 +57,7 @@ public class ReservationService {
     }
 
     public List<ReservationDetailedDto> getAllForCurrentUser() {
-        UserDto currentUser = userService.getCurrentUser();
+        UserDto currentUser = userService.getCurrentUserDto();
         List<Reservation> reservations = reservationRepository.findAllByUserId(currentUser.getId());
         logger.info("{} reservations found", reservations.size());
         return reservationMapper.mapToDetailedDtoList(reservations);

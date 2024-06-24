@@ -12,7 +12,7 @@ public class ServiceDto {
     private String name;
     private List<Long> categoryIds;
     private List<Long> durationIds;
-    private List<Long> businessIds;
+    private Long businessId;
     private List<Long> addressIds;
     private List<Long> priceIds;
     private Instant created;

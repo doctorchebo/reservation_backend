@@ -24,12 +24,7 @@ public class Business {
     @OneToMany(mappedBy = "business", fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)
     private List<Member> members;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "business_service",
-            joinColumns = @JoinColumn(name = "business_id"),
-            inverseJoinColumns = @JoinColumn(name = "service_id")
-    )
+    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<Service> services;
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private User owner;
