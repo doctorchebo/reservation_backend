@@ -131,7 +131,7 @@ public class BusinessService {
                 .orElseThrow(() -> new NotFoundException(String.format("User with owner id %s not found", userId)));
 
         List<Business> businesses = businessRepository.findByOwnerId(user.getId());
-        return businessMapper.mapToResponseList(businesses);
+        return businessMapper.mapToResponseList(presignImageUrls(businesses));
     }
 
     public BusinessResponse patchBusinessCategories(BusinessPatchCategoriesRequest request) {
@@ -235,13 +235,20 @@ public class BusinessService {
         return businessMapper.mapToResponse(savedBusiness);
     }
 
+    @Transactional
     public BusinessResponse deleteBusiness(Long businessId) {
         Business business = businessRepository.findById(businessId)
                 .orElseThrow(() -> new NotFoundException(
                         String.format("Business with id %s not found", businessId)));
 
-        businessRepository.delete(business);
-
+        // remove from AWS all images associated with the business
+        List<Image> images = business.getImages();
+        if(!images.isEmpty()){
+            for(Image image: images){
+                imageUploadService.deleteFileFromS3Bucket(image.getUrl());
+            }
+        }
+        businessRepository.deleteById(business.getId());
         return businessMapper.mapToResponse(business);
     }
 

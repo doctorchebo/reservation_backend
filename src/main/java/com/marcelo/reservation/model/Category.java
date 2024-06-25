@@ -23,9 +23,11 @@ public class Category {
     @NotBlank(message = "Category name cannot be blank")
     private String name;
 
+    @Column(length = 1024, columnDefinition="TEXT")
     private String imageUrl;
 
-    @ManyToMany(mappedBy = "categories", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "categories", fetch = FetchType.EAGER,
+            cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private List<Business> businesses;
 
     @ManyToMany(fetch = FetchType.EAGER,

@@ -56,6 +56,7 @@ public class UserService {
                 .password(userRequest.getPassword())
                 .email(userRequest.getEmail())
                 .isEnabled(true)
+                .isSuperUser(userRequest.isSuperUser())
                 .created(Instant.now())
                 .build();
 

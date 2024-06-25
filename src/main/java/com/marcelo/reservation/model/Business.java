@@ -3,6 +3,8 @@ package com.marcelo.reservation.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.Instant;
 import java.util.List;
@@ -38,9 +40,11 @@ public class Business {
     private List<Category> categories;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "business", orphanRemoval = true, cascade = CascadeType.ALL)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Address> addresses;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "business", orphanRemoval = true, cascade = CascadeType.ALL)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Image> images;
 
     private Instant created;

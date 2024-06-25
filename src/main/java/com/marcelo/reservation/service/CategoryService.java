@@ -1,6 +1,9 @@
 package com.marcelo.reservation.service;
 
+import com.marcelo.reservation.dto.category.CategoryCreateRequest;
 import com.marcelo.reservation.dto.category.CategoryDto;
+import com.marcelo.reservation.dto.category.CategoryPatchImageRequest;
+import com.marcelo.reservation.dto.category.CategoryPatchNameRequest;
 import com.marcelo.reservation.exception.NotFoundException;
 import com.marcelo.reservation.mapper.CategoryMapper;
 import com.marcelo.reservation.model.Category;
@@ -12,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,14 +33,15 @@ public class CategoryService {
     private final ImageUploadService imageUploadService;
 
     private final S3Service s3Service;
-    public CategoryDto createCategory(CategoryDto categoryDto, MultipartFile image) {
-        String imageUrl = imageUploadService.uploadFile("media/images/", image);
+    public CategoryDto createCategory(CategoryCreateRequest request) {
+        String imageUrl = imageUploadService.uploadFile("media/images/", request.getImage());
         Category category = Category.builder()
-                .name(categoryDto.getName())
+                .name(request.getName())
                 .services(new ArrayList<com.marcelo.reservation.model.Service>())
                 .imageUrl(imageUrl)
                 .build();
-        return categoryMapper.mapToDto(categoryRepository.save(category));
+        Category savedCategory = categoryRepository.save(category);
+        return categoryMapper.mapToDto(presignImageUrls(savedCategory));
     }
 
     public List<CategoryDto> getAllCategories() {
@@ -69,27 +72,29 @@ public class CategoryService {
         return categoryMapper.mapToDto(category);
     }
 
-    public CategoryDto updateCategoryName(CategoryDto categoryDto) {
-        Category category = categoryRepository.findById(categoryDto.getId())
+    public CategoryDto patchCategoryName(CategoryPatchNameRequest request) {
+        Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new NotFoundException(
-                        String.format("Category with id %s not found", categoryDto.getId())));
-        category.setName(categoryDto.getName());
-        return categoryMapper.mapToDto(categoryRepository.save(category));
+                        String.format("Category with id %s not found", request.getCategoryId())));
+        category.setName(request.getName());
+        Category savedCategory = categoryRepository.save(category);
+        return categoryMapper.mapToDto(presignImageUrls(savedCategory));
     }
 
     @Transactional
-    public CategoryDto updateCategoryImage(MultipartFile image, CategoryDto categoryDto) {
-        Category category = categoryRepository.findById(categoryDto.getId())
+    public CategoryDto patchCategoryImage(CategoryPatchImageRequest request) {
+        Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new NotFoundException(
-                        String.format("Category with id %s not found", categoryDto.getId())));
+                        String.format("Category with id %s not found", request.getCategoryId())));
 
         // delete old image
-        imageUploadService.deleteFileFromS3Bucket(category.getImageUrl());
+        if(!category.getImageUrl().isEmpty()){
+            imageUploadService.deleteFileFromS3Bucket(category.getImageUrl());
 
-        String imageUrl = imageUploadService.uploadFile("media/images/", image);
+        }
+        String imageUrl = imageUploadService.uploadFile("media/images/", request.getImage());
         category.setImageUrl(imageUrl);
-
-        return categoryMapper.mapToDto(categoryRepository.save(category));
+        return categoryMapper.mapToDto(presignImageUrls(categoryRepository.save(category)));
     }
 
     public CategoryDto updateServices(CategoryDto categoryDto) {
@@ -100,5 +105,25 @@ public class CategoryService {
         category.setServices(services);
         Category savedCategory = categoryRepository.save(category);
         return categoryMapper.mapToDto(savedCategory);
+    }
+
+    private List<Category> presignImageUrls(List<Category> categories){
+        // getting presigned urls for categories images
+        for(Category category: categories){
+            if(!category.getImageUrl().isEmpty()){
+                String imageUrl = s3Service.generatePresignedUrl(category.getImageUrl());
+                category.setImageUrl(imageUrl);
+            }
+        }
+        return categories;
+    }
+
+    private Category presignImageUrls(Category category){
+        // getting presigned urls for category images
+        if(!category.getImageUrl().isEmpty()){
+            String imageUrl = s3Service.generatePresignedUrl(category.getImageUrl());
+            category.setImageUrl(imageUrl);
+        }
+        return category;
     }
 }

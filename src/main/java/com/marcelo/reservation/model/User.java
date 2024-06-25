@@ -42,5 +42,7 @@ public class User {
 
     private boolean isEnabled;
 
+    private boolean isSuperUser;
+
     private Instant created;
 }
