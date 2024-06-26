@@ -1,6 +1,7 @@
 package com.marcelo.reservation.dto.member;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.marcelo.reservation.dto.calendar.CalendarDto;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,6 +29,7 @@ public class MemberDto {
     @JsonProperty("isActive")
     private boolean isActive;
     private Long addressId;
+    private CalendarDto calendar;
     private Instant created;
     private Instant modified;
 }

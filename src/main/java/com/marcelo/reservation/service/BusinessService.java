@@ -94,8 +94,8 @@ public class BusinessService {
                 .orElseThrow(() ->
                         new NotFoundException(String.format("Business with id %s not found", businessPatchNameRequest.getBusinessId())));
         business.setName(businessPatchNameRequest.getName());
-        businessRepository.save(business);
-        return businessMapper.mapToResponse(business);
+        Business savedBusiness = businessRepository.save(business);
+        return businessMapper.mapToResponse(presignImageUrls(savedBusiness));
     }
 
     @Transactional
@@ -142,8 +142,8 @@ public class BusinessService {
         List<Category> newCategories = categoryRepository.findAllById(request.getCategoryIds());
         business.getCategories().clear();
         business.getCategories().addAll(newCategories);
-        Business saveBusiness = businessRepository.save(business);
-        return businessMapper.mapToResponse(saveBusiness);
+        Business savedBusiness = businessRepository.save(business);
+        return businessMapper.mapToResponse(presignImageUrls(savedBusiness));
     }
 
 
@@ -169,7 +169,7 @@ public class BusinessService {
         business.getImages().clear();
         business.getImages().addAll(newImages);
         Business savedBusiness = businessRepository.save(business);
-        return businessMapper.mapToResponse(savedBusiness);
+        return businessMapper.mapToResponse(presignImageUrls(savedBusiness));
     }
 
     private List<Business> presignImageUrls(List<Business> businesses){

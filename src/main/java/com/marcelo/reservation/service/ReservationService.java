@@ -113,6 +113,12 @@ public class ReservationService {
         return reservationMapper.mapToDtoList(reservations);
     }
 
+    public List<ReservationDto> getAllReservationsByMemberAndStartDate(Long memberId, UUID serviceId, Long businessId, Instant date) {
+        Instant endDate = date.plus(1, ChronoUnit.DAYS);
+        List<Reservation> reservations = reservationRepository.findAllByMemberIdAndServiceIdAndBusinessIdAndDate(memberId, serviceId, businessId, date, endDate);
+        return reservationMapper.mapToDtoList(reservations);
+    }
+
     @Transactional
     public ReservationDetailedDto deleteReservation(UUID reservationId) {
         Reservation reservation = reservationRepository.findById(reservationId)

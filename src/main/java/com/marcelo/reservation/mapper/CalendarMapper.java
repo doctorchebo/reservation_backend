@@ -7,7 +7,7 @@ import org.mapstruct.Mapper;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {ScheduleMapper.class})
 public interface CalendarMapper {
     CalendarDto mapToDto(Calendar calendar);
 

@@ -23,6 +23,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, UUID> 
     @Query("SELECT r FROM Reservation r WHERE r.startTime < :endDate AND r.endTime > :startDate AND r.service.id = :serviceId AND r.business.id = :businessId")
     List<Reservation> findAllByServiceIdAndBusinessIdAndDate(@Param("serviceId") UUID serviceId, @Param("businessId") Long businessId, @Param("startDate") Instant startDate, @Param("endDate") Instant endDate);
 
+    @Query("SELECT r FROM Reservation r WHERE r.startTime < :endDate AND r.endTime > :startDate AND r.service.id = :serviceId AND r.business.id = :businessId AND (:memberId IS NULL OR r.member.id = :memberId)")
+    List<Reservation> findAllByMemberIdAndServiceIdAndBusinessIdAndDate(@Param("memberId") Long memberId, @Param("serviceId") UUID serviceId, @Param("businessId") Long businessId, @Param("startDate") Instant startDate, @Param("endDate") Instant endDate);
+
     @Modifying
     @Query("DELETE FROM Reservation r WHERE r.id = :reservationId")
     void deleteByReservationId(@Param("reservationId") UUID reservationId);

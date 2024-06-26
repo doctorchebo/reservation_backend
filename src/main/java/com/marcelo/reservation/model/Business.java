@@ -26,7 +26,7 @@ public class Business {
     @OneToMany(mappedBy = "business", fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)
     private List<Member> members;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL}, orphanRemoval = true)
+    @OneToMany(mappedBy = "business", fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)
     private List<Service> services;
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private User owner;

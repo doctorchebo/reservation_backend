@@ -38,6 +38,15 @@ public class ReservationController {
         return ResponseEntity.ok(reservationService.getAllReservationsByDate(serviceId, businessId, date));
     }
 
+    @GetMapping("getAllByMemberAndStartDate/{memberId}/{serviceId}/{businessId}/{date}")
+    public ResponseEntity<List<ReservationDto>> getAllReservationsByMemberAndStartDate(
+            @Valid @PathVariable("memberId") Long memberId,
+            @PathVariable("serviceId") UUID serviceId,
+            @PathVariable("businessId") Long businessId,
+            @PathVariable("date") Instant date){
+        return ResponseEntity.ok(reservationService.getAllReservationsByMemberAndStartDate(memberId, serviceId, businessId, date));
+    }
+
     @GetMapping("getAllByUserId/{userId}")
     public ResponseEntity<List<ReservationDto>> getAllByUserId(
             @Positive @PathVariable("userId") Long userId){

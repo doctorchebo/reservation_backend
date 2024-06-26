@@ -32,6 +32,10 @@ public class MemberService {
 
     private final BusinessRepository businessRepository;
     private final MemberMapper memberMapper;
+
+    public List<MemberDto> getAllMembers() {
+        return memberMapper.mapToDtoList(memberRepository.findAll());
+    }
     public List<MemberDto> getAllByBusinessId(Long businessId) {
         logger.info("Getting all members for business with id {}", businessId);
         List<Member> members = memberRepository.findByBusinessId(businessId);
@@ -44,25 +48,25 @@ public class MemberService {
         return memberMapper.mapToDtoList(members);
     }
 
-    public MemberDto createMember(MemberDto memberDto) {
-        User user = userRepository.findById(memberDto.getUserId())
+    public MemberDto createMember(MemberCreateRequest request) {
+        User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new NotFoundException(
-                        String.format("User with id %s not found", memberDto.getUserId())));
+                        String.format("User with id %s not found", request.getUserId())));
 
-        Business business = businessRepository.findById(memberDto.getBusinessId())
+        Business business = businessRepository.findById(request.getBusinessId())
                 .orElseThrow(() -> new NotFoundException(
-                        String.format("Business with id %s not found", memberDto.getBusinessId())));
+                        String.format("Business with id %s not found", request.getBusinessId())));
 
-        Address address = addressRepository.findById(memberDto.getAddressId())
+        Address address = addressRepository.findById(request.getAddressId())
                 .orElseThrow(() -> new NotFoundException(
-                        String.format("Address with id %s not found", memberDto.getAddressId())));
+                        String.format("Address with id %s not found", request.getAddressId())));
 
         Member member = Member.builder()
-                .title(memberDto.getTitle())
-                .firstName(memberDto.getFirstName())
-                .lastName(memberDto.getLastName())
-                .phoneNumber(memberDto.getPhoneNumber())
-                .isActive(memberDto.isActive())
+                .title(request.getTitle())
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .phoneNumber(request.getPhoneNumber())
+                .isActive(request.isActive())
                 .user(user)
                 .business(business)
                 .address(address)
@@ -70,6 +74,14 @@ public class MemberService {
                 .build();
 
         return memberMapper.mapToDto(memberRepository.save(member));
+    }
+
+    public MemberDto deleteMemberById(Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Member with id %s not found", memberId)));
+        memberRepository.deleteById(member.getId());
+        return memberMapper.mapToDto(member);
     }
 
     public MemberDto getMemberById(Long memberId) {
@@ -128,4 +140,5 @@ public class MemberService {
         member.setAddress(address);
         return memberMapper.mapToDto(memberRepository.save(member));
     }
+
 }

@@ -34,7 +34,7 @@ public class CategoryService {
 
     private final S3Service s3Service;
     public CategoryDto createCategory(CategoryCreateRequest request) {
-        String imageUrl = imageUploadService.uploadFile("media/images/", request.getImage());
+        String imageUrl = imageUploadService.uploadFile("media/images/category/", request.getImage());
         Category category = Category.builder()
                 .name(request.getName())
                 .services(new ArrayList<com.marcelo.reservation.model.Service>())
@@ -46,7 +46,7 @@ public class CategoryService {
 
     public List<CategoryDto> getAllCategories() {
         logger.info("Getting all categories");
-        List<Category> categories = categoryRepository.findAll();
+        List<Category> categories = categoryRepository.findAllByOrderByNameAsc();
         logger.info("{} categories found", categories.size());
         for(Category category : categories){
             if(category.getImageUrl() != null){
@@ -81,7 +81,6 @@ public class CategoryService {
         return categoryMapper.mapToDto(presignImageUrls(savedCategory));
     }
 
-    @Transactional
     public CategoryDto patchCategoryImage(CategoryPatchImageRequest request) {
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new NotFoundException(
@@ -92,9 +91,10 @@ public class CategoryService {
             imageUploadService.deleteFileFromS3Bucket(category.getImageUrl());
 
         }
-        String imageUrl = imageUploadService.uploadFile("media/images/", request.getImage());
+        String imageUrl = imageUploadService.uploadFile("media/images/category/", request.getImage());
         category.setImageUrl(imageUrl);
-        return categoryMapper.mapToDto(presignImageUrls(categoryRepository.save(category)));
+        Category savedCategory = categoryRepository.save(category);
+        return categoryMapper.mapToDto(presignImageUrls(savedCategory));
     }
 
     public CategoryDto updateServices(CategoryDto categoryDto) {
