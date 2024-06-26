@@ -90,7 +90,7 @@ public class BusinessController {
     }
 
     @PatchMapping(value = "patchImages")
-    public ResponseEntity<BusinessResponse> patchBusinessImages(@Valid @ModelAttribute BusinessPatchImagesRequest request){
+    public ResponseEntity<BusinessResponse> patchBusinessImages(@ModelAttribute BusinessPatchImagesRequest request){
         return ResponseEntity.ok(businessService.patchBusinessImages(request));
     }
 

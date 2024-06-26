@@ -258,19 +258,30 @@ public class BusinessService {
                         String.format("Business with id %s not found", request.getBusinessId())));
 
         List<Image> existingImages = business.getImages();
-        List<Long> existingImageIds = existingImages.stream().map(image -> image.getId()).collect(Collectors.toList());
 
         for(FileRequest fileRequest : request.getFiles()){
-            //find old image to replace with the new one
-            Image oldImage = existingImages.stream().filter(image -> image.getId().equals(fileRequest.getId())).findAny().orElse(null);
-            if(!oldImage.getUrl().equals(fileRequest.getFile().getName())){
-                //delete image if it's (url) is different from the existing image's url
-                imageUploadService.deleteFileFromS3Bucket(oldImage.getUrl());
-                // upload new image
+            if(fileRequest.getId() == null){
+                // the business doesn't have images. Upload the image directly
                 String url = imageUploadService.uploadFile(String.format("media/images/business/%s/", request.getBusinessId()), fileRequest.getFile());
-                oldImage.setUrl(url);
+                Image image = Image.builder()
+                        .url(url)
+                        .business(business)
+                        .created(Instant.now())
+                        .build();
+                business.getImages().add(image);
+            } else {
+                //find old image to replace with the new one
+                Image oldImage = existingImages.stream().filter(image -> image.getId().equals(fileRequest.getId())).findAny().orElse(null);
+                if(!oldImage.getUrl().equals(fileRequest.getFile().getName())){
+                    //delete image if it's (url) is different from the existing image's url
+                    imageUploadService.deleteFileFromS3Bucket(oldImage.getUrl());
+                    // upload new image
+                    String url = imageUploadService.uploadFile(String.format("media/images/business/%s/", request.getBusinessId()), fileRequest.getFile());
+                    oldImage.setUrl(url);
+                }
             }
         }
-        return businessMapper.mapToResponse(businessRepository.save(business));
+        Business savedBusiness = businessRepository.save(business);
+        return businessMapper.mapToResponse(presignImageUrls(savedBusiness));
     }
 }
