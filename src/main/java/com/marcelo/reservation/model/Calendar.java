@@ -5,9 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -20,11 +18,11 @@ public class Calendar {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private List<Schedule> schedules = new ArrayList<>();
+    @OneToMany(mappedBy="scheduleCalendar", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    public List<Schedule> schedules;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private List<Schedule> unavailableDates = new ArrayList<>();
+    @OneToMany(mappedBy="unavailableDateCalendar", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    public List<Schedule> unavailableSchedules;
 
     @OneToOne(mappedBy = "calendar")
     private Member member;

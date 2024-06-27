@@ -1,7 +1,7 @@
 package com.marcelo.reservation.service;
 
 import com.marcelo.reservation.dto.schedule.ScheduleDto;
-import com.marcelo.reservation.dto.schedule.ScheduleRequest;
+import com.marcelo.reservation.dto.schedule.ScheduleCreateRequest;
 import com.marcelo.reservation.exception.NotFoundException;
 import com.marcelo.reservation.mapper.ScheduleMapper;
 import com.marcelo.reservation.model.Calendar;
@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.Instant;
 import java.util.List;
 
@@ -31,19 +32,39 @@ public class ScheduleService {
         return scheduleMapper.mapToDtoList(scheduleRepository.findAll());
     }
 
-    public ScheduleDto createSchedule(ScheduleRequest scheduleRequest) {
-        Calendar calendar = calendarRepository.findById(scheduleRequest.getCalendarId())
+    public  List<ScheduleDto> getAllSchedulesByBusinessId(Long businessId) {
+        return scheduleMapper.mapToDtoList(scheduleRepository.findAllByScheduleCalendarMemberBusinessId(businessId));
+    }
+
+    public List<ScheduleDto> getAllSchedulesByMemberId(Long memberId) {
+        return scheduleMapper.mapToDtoList(scheduleRepository.findAllByScheduleCalendarMemberId(memberId));
+    }
+
+    public List<ScheduleDto> getAllSchedulesByCalendarId(Long calendarId) {
+        return scheduleMapper.mapToDtoList(scheduleRepository.findAllByScheduleCalendarId(calendarId));
+    }
+    public ScheduleDto createSchedule(ScheduleCreateRequest request) {
+        Calendar calendar = calendarRepository.findById(request.getCalendarId())
                 .orElseThrow(() -> new NotFoundException(
-                        String.format("Calendar with id %s not found", scheduleRequest.getCalendarId())));
+                        String.format("Calendar with id %s not found", request.getCalendarId())));
         Schedule schedule = Schedule.builder()
                 .scheduleCalendar(calendar)
                 .unavailableDateCalendar(calendar)
-                .dayOfWeek(scheduleRequest.getDayOfWeek())
-                .isWholeDay(scheduleRequest.isWholeDay())
-                .startTime(scheduleRequest.getStartTime())
-                .endTime(scheduleRequest.getEndTime())
+                // db interprets 1 as 0
+                .dayOfWeek(DayOfWeek.of(request.getDayOfWeek().getValue() - 1))
+                .isWholeDay(request.isWholeDay())
+                .startTime(request.getStartTime())
+                .endTime(request.getEndTime())
                 .created(Instant.now())
                 .build();
         return scheduleMapper.mapToDto(scheduleRepository.save(schedule));
+    }
+
+    public ScheduleDto deleteSchedule(Long scheduleId) {
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Schedule with id %s not found", scheduleId)));
+        scheduleRepository.deleteById(schedule.getId());
+        return scheduleMapper.mapToDto(schedule);
     }
 }

@@ -71,4 +71,8 @@ public class MemberController {
     public ResponseEntity<MemberDto> patchMemberAddress(@RequestBody MemberPatchAddressRequest request){
         return ResponseEntity.ok(memberService.patchMemberAddress(request));
     }
+    @PatchMapping("patchIsActive")
+    public ResponseEntity<MemberDto> patchMemberIsActive(@RequestBody MemberPatchIsActiveRequest request){
+        return ResponseEntity.ok(memberService.patchMemberIsActive(request));
+    }
 }

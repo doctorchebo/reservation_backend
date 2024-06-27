@@ -9,7 +9,7 @@ import java.time.Instant;
 public class ScheduleDto {
     private Long id;
     private Long calendarId;
-    private DayOfWeek dayOfWeek;
+    private int dayOfWeek;
     private boolean isWholeDay;
     private Instant startTime;
     private Instant endTime;

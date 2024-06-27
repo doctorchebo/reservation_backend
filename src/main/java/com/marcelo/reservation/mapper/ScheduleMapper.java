@@ -11,6 +11,7 @@ import java.util.List;
 public interface ScheduleMapper {
 
     @Mapping(target="calendarId", source="scheduleCalendar.id")
+    @Mapping(target="dayOfWeek", expression="java(schedule.getDayOfWeek().getValue())")
     ScheduleDto mapToDto(Schedule schedule);
 
     List<ScheduleDto> mapToDtoList(List<Schedule> schedules);

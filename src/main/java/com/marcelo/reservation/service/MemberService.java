@@ -3,10 +3,7 @@ package com.marcelo.reservation.service;
 import com.marcelo.reservation.dto.member.*;
 import com.marcelo.reservation.exception.NotFoundException;
 import com.marcelo.reservation.mapper.MemberMapper;
-import com.marcelo.reservation.model.Address;
-import com.marcelo.reservation.model.Business;
-import com.marcelo.reservation.model.Member;
-import com.marcelo.reservation.model.User;
+import com.marcelo.reservation.model.*;
 import com.marcelo.reservation.repository.AddressRepository;
 import com.marcelo.reservation.repository.BusinessRepository;
 import com.marcelo.reservation.repository.MemberRepository;
@@ -72,6 +69,13 @@ public class MemberService {
                 .address(address)
                 .created(Instant.now())
                 .build();
+
+        // create calendar
+        Calendar calendar = Calendar.builder()
+                .member(member)
+                .created(Instant.now())
+                .build();
+        member.setCalendar(calendar);
 
         return memberMapper.mapToDto(memberRepository.save(member));
     }
@@ -141,4 +145,11 @@ public class MemberService {
         return memberMapper.mapToDto(memberRepository.save(member));
     }
 
+    public MemberDto patchMemberIsActive(MemberPatchIsActiveRequest request) {
+        Member member = memberRepository.findById(request.getMemberId())
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Member with id %s not found", request.getMemberId())));
+        member.setActive(request.isActive());
+        return memberMapper.mapToDto(memberRepository.save(member));
+    }
 }

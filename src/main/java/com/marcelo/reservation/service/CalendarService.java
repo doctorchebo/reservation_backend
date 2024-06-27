@@ -41,6 +41,6 @@ public class CalendarService {
                 .created(Instant.now())
                 .build();
 
-        return calendarMapper.mapToDto(calendar);
+        return calendarMapper.mapToDto(calendarRepository.save(calendar));
     }
 }
