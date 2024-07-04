@@ -1,5 +1,6 @@
 package com.marcelo.reservation.model;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,7 +20,7 @@ public class Schedule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne()
+    @ManyToOne
     private Calendar scheduleCalendar;
 
     @ManyToOne
@@ -29,8 +30,10 @@ public class Schedule {
 
     private boolean isWholeDay;
 
+    @Nullable
     private Instant startTime;
 
+    @Nullable
     private Instant endTime;
 
     private Instant created;
