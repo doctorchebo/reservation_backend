@@ -109,7 +109,7 @@ public class ScheduleService {
         Schedule schedule = scheduleRepository.findById(request.getScheduleId())
                 .orElseThrow(() -> new NotFoundException(
                         String.format("Schedule with id %s not found", request.getScheduleId())));
-        if(request.getEndTime().isBefore(schedule.getEndTime())){
+        if(request.getEndTime().isBefore(schedule.getStartTime())){
             // end time cannot be before start time
             throw new NotValidDateException("End Time cannot be before Start Time");
         }
