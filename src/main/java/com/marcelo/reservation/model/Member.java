@@ -28,7 +28,7 @@ public class Member {
     @OneToMany(mappedBy = "member",
             cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private List<Reservation> reservations;
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Calendar calendar;
 
     @NotBlank(message = "First Name cannot be blank")

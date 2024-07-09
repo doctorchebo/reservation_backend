@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -73,6 +74,8 @@ public class MemberService {
         // create calendar
         Calendar calendar = Calendar.builder()
                 .member(member)
+                .schedules(new ArrayList<Schedule>())
+                .unavailableSchedules(new ArrayList<Schedule>())
                 .created(Instant.now())
                 .build();
         member.setCalendar(calendar);

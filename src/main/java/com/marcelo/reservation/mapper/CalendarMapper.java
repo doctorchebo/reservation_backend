@@ -7,6 +7,7 @@ import com.marcelo.reservation.model.Schedule;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,6 +19,9 @@ public interface CalendarMapper {
     CalendarDto mapToDto(Calendar calendar);
 
     default List<Long> getScheduleIds(List<Schedule> schedules){
+        if(schedules.isEmpty()){
+            return Collections.emptyList();
+        }
         return schedules.stream().map(schedule-> schedule.getId()).collect(Collectors.toList());
     }
 
