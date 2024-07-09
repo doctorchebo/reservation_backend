@@ -30,15 +30,15 @@ public class AddressService {
     private final AddressRepository addressRepository;
 
     private final AddressMapper addressMapper;
-    public AddressDto createAddress(AddressRequest addressRequest) {
-        Business business = businessRepository.findById(addressRequest.getBusinessId())
+    public AddressDto createAddress(AddressCreateRequest addressCreateRequest) {
+        Business business = businessRepository.findById(addressCreateRequest.getBusinessId())
                 .orElseThrow(() -> new NotFoundException(
-                        String.format("Business with id %s not found", addressRequest.getBusinessId())));
+                        String.format("Business with id %s not found", addressCreateRequest.getBusinessId())));
         Address address = Address.builder()
-                .name(addressRequest.getName())
+                .name(addressCreateRequest.getName())
                 .business(business)
                 .geolocation(null)
-                .isMainAddress(addressRequest.isMainAddress())
+                .isMainAddress(addressCreateRequest.isMainAddress())
                 .members(new ArrayList<Member>())
                 .services(new ArrayList<com.marcelo.reservation.model.Service>())
                 .created(Instant.now())
@@ -47,16 +47,16 @@ public class AddressService {
 
         Geolocation geolocation = Geolocation.builder()
                 .address(savedAddress)
-                .longitude(addressRequest.getLongitude())
-                .latitude(addressRequest.getLatitude())
+                .longitude(addressCreateRequest.getLongitude())
+                .latitude(addressCreateRequest.getLatitude())
                 .created(Instant.now())
                 .build();
         savedAddress.setGeolocation(geolocation);
 
         Address savedAddressWithGeolocation = addressRepository.save(savedAddress);
         // if new address is the main one, make other addresses secondary
-        if(addressRequest.isMainAddress()){
-            List<Address> addresses = addressRepository.findAllByBusinessId(addressRequest.getBusinessId());
+        if(addressCreateRequest.isMainAddress()){
+            List<Address> addresses = addressRepository.findAllByBusinessId(addressCreateRequest.getBusinessId());
             for(Address existingAddress : addresses){
                 if(!addresses.contains(address)) {
                     existingAddress.setMainAddress(false);
@@ -72,11 +72,11 @@ public class AddressService {
         return addressMapper.mapToDtoList(addressRepository.findAll());
     }
 
-    public AddressDto deleteAddressById(Long addressId) {
+    public AddressDto deleteAddress(Long addressId) {
         Address address = addressRepository.findById(addressId)
                 .orElseThrow(() -> new NotFoundException(
                         String.format("Business with id %s not found", addressId)));
-        addressRepository.delete(address);
+        addressRepository.deleteById(address.getId());
         return addressMapper.mapToDto(address);
     }
 

@@ -53,10 +53,6 @@ public class DurationService {
                 .orElseThrow(() -> new NotFoundException(
                         String.format("Business with id %s not found", durationRequest.getBusinessId())));
 
-        com.marcelo.reservation.model.Service service = serviceRepository.findById(durationRequest.getServiceId())
-                .orElseThrow(() -> new NotFoundException(
-                        String.format("Service with id %s not found", durationRequest.getServiceId())));
-
         Duration duration = Duration.builder()
                 .duration(durationRequest.getDuration())
                 .business(business)

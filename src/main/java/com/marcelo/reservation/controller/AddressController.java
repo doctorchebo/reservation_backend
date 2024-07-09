@@ -26,13 +26,13 @@ public class AddressController {
     }
 
     @PostMapping("create")
-    public ResponseEntity<AddressDto> createAddress(@RequestBody AddressRequest addressRequest){
-        return ResponseEntity.status(HttpStatus.CREATED).body(addressService.createAddress(addressRequest));
+    public ResponseEntity<AddressDto> createAddress(@RequestBody AddressCreateRequest addressCreateRequest){
+        return ResponseEntity.status(HttpStatus.CREATED).body(addressService.createAddress(addressCreateRequest));
     }
 
-    @DeleteMapping("deleteById/{addressId}")
-    public ResponseEntity<AddressDto> deleteAddressById(@PathVariable Long addressId){
-        return ResponseEntity.ok(addressService.deleteAddressById(addressId));
+    @DeleteMapping("delete/{addressId}")
+    public ResponseEntity<AddressDto> deleteAddressId(@PathVariable Long addressId){
+        return ResponseEntity.ok(addressService.deleteAddress(addressId));
     }
 
     @PatchMapping("patchName")

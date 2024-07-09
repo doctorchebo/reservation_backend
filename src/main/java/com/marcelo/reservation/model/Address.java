@@ -32,7 +32,8 @@ public class Address {
 
     private boolean isMainAddress;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, mappedBy = "address")
+    @OneToMany(fetch = FetchType.EAGER,
+            cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, mappedBy = "address")
     private List<Member> members;
 
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "addresses")

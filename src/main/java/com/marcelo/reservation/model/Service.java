@@ -23,7 +23,8 @@ public class Service {
     @ManyToOne(fetch = FetchType.EAGER)
     public Business business;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany(fetch = FetchType.EAGER,
+            cascade = {CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(
             name = "service_duration",
             joinColumns = @JoinColumn(name = "service_id"),

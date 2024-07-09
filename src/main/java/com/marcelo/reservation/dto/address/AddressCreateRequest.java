@@ -6,7 +6,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 @Data
-public class AddressRequest {
+public class AddressCreateRequest {
     private Long businessId;
     private String name;
     private BigDecimal longitude;
