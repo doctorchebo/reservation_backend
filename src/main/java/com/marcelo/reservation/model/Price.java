@@ -1,5 +1,6 @@
 package com.marcelo.reservation.model;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,10 +19,11 @@ public class Price {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
+    @Nullable
     private Service service;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     private Business business;
 
     private BigDecimal price;

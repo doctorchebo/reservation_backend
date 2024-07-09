@@ -38,7 +38,8 @@ public class Service {
     @ManyToMany(mappedBy = "services", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     public List<Category> categories;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade={CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE})
+    @ManyToMany(fetch = FetchType.EAGER,
+            cascade={CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE})
     @JoinTable(
             name = "service_address",
             joinColumns = @JoinColumn(name = "service_id"),
@@ -46,7 +47,7 @@ public class Service {
     )
     public List<Address> addresses;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "service", orphanRemoval = true, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "service", cascade=CascadeType.ALL, orphanRemoval = true)
     public List<Price> prices;
 
     private Instant created;

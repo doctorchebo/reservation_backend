@@ -90,7 +90,12 @@ public class ServiceService {
         com.marcelo.reservation.model.Service service = serviceRepository.findById(serviceId)
                 .orElseThrow(() -> new NotFoundException(
                         String.format("Business with id %s not found", serviceId)));
-        serviceRepository.delete(service);
+        List<Price> prices = service.getPrices();
+        for(Price price: prices){
+            price.setService(null);
+        }
+        priceRepository.saveAll(prices);
+        serviceRepository.deleteById(service.getId());
         return serviceMapper.mapToDto(service);
     }
 

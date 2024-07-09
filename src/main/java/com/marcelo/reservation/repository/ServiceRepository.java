@@ -4,7 +4,9 @@ import com.marcelo.reservation.model.Category;
 import com.marcelo.reservation.model.Duration;
 import com.marcelo.reservation.model.Service;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
@@ -34,4 +36,8 @@ public interface ServiceRepository extends JpaRepository<Service, UUID> {
     List<Service> findAllByCategories(List<Category> categories);
 
     List<Service> findByDurations(List<Duration> durations);
+
+    @Modifying
+    @Query("DELETE FROM Service s WHERE s.id = :serviceId")
+    void deleteById(@Param("serviceId") UUID serviceId);
 }
